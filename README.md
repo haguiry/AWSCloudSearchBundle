@@ -89,10 +89,11 @@ Example:
         }
 
 This matches an index with the fields:
-id : uint
-number : uint
-title : text
-groups : uint
+
+        id : uint
+        number : uint
+        title : text
+        groups : uint
 
 4) Search Usage
 --------------
