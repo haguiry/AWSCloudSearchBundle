@@ -32,11 +32,12 @@ class CloudSearchIndexer {
 	* Index and Array of documents object. Objects must match AWS Cloud Search fields format and
 	* have unique integer property called id.
 	*
-	* @param documents - string of array of document objects.
+	* @param documentsjson - json string of document objects.
 	* @param indexname - string that matches configured index.
 	* @param action - string Cloud Search API action to be carried out on these documents.
 	*/
-	public function indexDocuments($documentobjs, $indexname, $action){
+	public function indexDocuments($documentsjson, $indexname, $action){
+		$documentobjs = json_decode($documentsjson);
 
 		$indexname = 'redeye_test';
 
