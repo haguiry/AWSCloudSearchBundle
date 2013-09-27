@@ -9,10 +9,10 @@ http://docs.aws.amazon.com/cloudsearch/latest/developerguide/SvcIntro.html
 1) Installation
 ---------------
 Install PHP Curl module:
-    yum install php-curl
+        yum install php-curl
 
 Add to composer.json:
-    "redeyeapps/awscloudsearchbundle" : "dev-master"
+        "redeyeapps/awscloudsearchbundle" : "dev-master"
 
 2) Configuration
 ---------------
@@ -55,35 +55,35 @@ http://jmsyst.com/bundles/JMSSerializerBundle/master/installation
 This bundle is pretty complex to setup and adds a few extra depenacies. In our case we have just created a simple function on the entities we need to index called getSearchFields() which manually converts the entity to an object that that matches the fields configured for our indexes. This is just json encoded and passed to the indexer service.
 
 Example:
-    public function getSearchFields() {
-        $obj = new \StdClass;
-        $obj->id = $this->getId();
-        $number = $this->getNumber();
+        public function getSearchFields() {
+            $obj = new \StdClass;
+            $obj->id = $this->getId();
+            $number = $this->getNumber();
 
-        //Be careful with null fields
-        if($code == null) {
-            $number = '';
+            //Be careful with null fields
+            if($code == null) {
+                $number = '';
+            }
+            $obj->number = $number;
+
+            $title = $this->getTitle();
+            if($title == null) {
+                $title = '';
+            }
+            $obj->title = $title;
+
+            //Groups Array
+            $groups = array();
+            foreach($this->getGroups() as $group) {
+                $groups[] = $group->getId();
+            }
+
+            if(count($groups) > 0){
+                $obj->groups = $groups;
+            }
+
+            return $obj;
         }
-        $obj->number = $number;
-
-        $title = $this->getTitle();
-        if($title == null) {
-            $title = '';
-        }
-        $obj->title = $title;
-
-        //Groups Array
-        $groups = array();
-        foreach($this->getGroups() as $group) {
-            $groups[] = $group->getId();
-        }
-
-        if(count($groups) > 0){
-            $obj->groups = $groups;
-        }
-
-        return $obj;
-    }
 
 This matches an index with the fields:
 id : uint
