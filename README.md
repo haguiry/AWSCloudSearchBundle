@@ -5,6 +5,8 @@ This bundle is designed to make it easier to integrate Amazon Cloud Search with 
 
 
 1) Installation
+---------------
+
 Install PHP Curl module:
     yum install php-curl
 

@@ -1,0 +1,23 @@
+{
+  "name": "redeyeapps/awscloudsearchbundle",
+  "type": "symfony-bundle",
+  "description": "AWS Cloud Search bundle for Symfony 2",
+  "keywords": ["aws", "cloudsearch", "symfony2"],
+  "homepage": "https://github.com/RedEyeDrafting/AWSCloudSearchBundle",
+  "license": "BSD-2-Clause",
+  "authors": [
+    {
+      "name": "Chris Gordon",
+      "email": "chris@redeyeapps.com.au"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.3"
+  },
+  "autoload": {
+    "psr-0": {
+      "RedEyeApps\\AWSCloudSearchBundle": ""
+    }
+  },
+  "target-dir": "RedEyeApps/AWSCloudSearchBundle"
+}
