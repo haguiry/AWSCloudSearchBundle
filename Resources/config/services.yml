@@ -1,0 +1,12 @@
+parameters:
+#    aws_cloud_search.example.class: RedEyeApps\Bundle\AWSCloudSearchBundle\Example
+
+services:
+    cloudsearchindexer:
+            class: RedEyeApps\AWSCloudSearchBundle\Services\CloudSearchIndexer
+            arguments:
+                - "@service_container"
+    cloudsearcher:
+            class: RedEyeApps\AWSCloudSearchBundle\Services\CloudSearcher
+            arguments:
+                - "@service_container"
