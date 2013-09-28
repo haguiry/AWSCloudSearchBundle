@@ -45,11 +45,11 @@ class CloudSearcher {
 	*								Object('fieldname' => 'title', 'order' => 'DESC'), 
 	*								Object('fieldname' => 'author', 'order' => 'ASC')
 	*					  );
+	* @param array - Array of string field names to return on results, document id return by default.
 	*/
 	public function search($indexname, $searchterm = '', $matchmode = 'normal', $length = 25, $offset = 0, 
-						   $searchfields = array(), $filterfields = array(), $sortfields = array()) {
-
-		$indexname = 'redeye_test';
+						   $searchfields = array(), $filterfields = array(), $sortfields = array(),
+						   $returnfields = array()) {
 
 		//Get configuration for specified index.
 		if(isset($this->indexes[$indexname])){
@@ -61,7 +61,7 @@ class CloudSearcher {
 
 			//Construct query string for filters.
 			$filtersstr = $this->filterFieldsQuery($filterfields);	
-		
+
 			//Construct sorting/ranking query string.
 			//$sortstr = $this->sortQuery($sortfields);	
 
@@ -70,7 +70,7 @@ class CloudSearcher {
 			if(strlen($searchfieldsstr) > 0 && strlen($filtersstr) > 0){
 				//Create query using search fields and filter fields
 				$searchstr .= "(and (or " . $searchfieldsstr.") ";
-				$searchstr .= "(" . $filtersstr . "))";
+				$searchstr .= " " . $filtersstr . " )";
 
 			} elseif(strlen($searchfieldsstr) > 0 && strlen($filtersstr) == 0) {
 				//Only use search fields
@@ -80,14 +80,18 @@ class CloudSearcher {
 
 			$searchurl = $indexconfig['search_endpoint']."/".$this->apiversion."/"."search?bq=".urlencode($searchstr);
 
+			//Set return fields
+			$returnfieldsstr = $this->returnFieldsQuery($returnfields);
+			$searchurl .= "&".$returnfieldsstr;
+
 			//Set number results to return, and offset.
 			$searchurl .= "&size=".$length;
-			$searchstr .= "&start=".$offset;
-			
+			$searchurl .= "&start=".$offset;
+
 			//Do the search
 			$results = $this->get($searchurl);
 
-			return $results;
+			return json_decode($results);
 		} else {
 			return 'Specified index not configured.';
 		}
@@ -150,27 +154,21 @@ class CloudSearcher {
 		//Set filters for each field
 		$currentfiltertype = '';
 		foreach ($filterfields as $field) {
+
 			//Get field settings
 			$fieldstr = '';
 			$fieldvalues = 0;
-			$fieldfiltertype = $field->type;
+			$fieldstr = ' (' . $field->type . ' ';
 
 			//Add each value for field to filter.
 			foreach($field->values as $value) {
-
-				if($fieldfiltertype != $currentfiltertype){
-					//Change filter type for this field
-					$currentfiltertype = $field->type;
-					$fieldstr .= $currentfiltertype . ' ';
-				} 
-
 				//Add field to field query string
 				$fieldstr .= $field->name . ":" . $value . " ";
 				$fieldvalues++;
 			}
 
-			if($fieldvalues > 0) {
-				$filterstring .= $fieldstr;	
+			if($fieldvalues >= 1) {
+				$filterstring .= $fieldstr . ')';	
 			}
 		}
 
@@ -211,6 +209,29 @@ class CloudSearcher {
    		}
 
    		return $sortstring;
+   }
+
+   /**
+   * Generates query string to match Cloud Search API for fields to return from index.
+   * @param searchfields - Array of field fieldnames to return in results.
+   */
+   private function returnFieldsQuery($returnfields) {
+
+   		$returnfieldstring = '';
+   		$fieldcount = 0;
+   		foreach($returnfields as $fieldname) {
+   				if($fieldcount >= 1) {
+   					$returnfieldstring .= ',';
+   				}
+   				$returnfieldstring .= $fieldname;
+   				$fieldcount++;
+   		}
+
+   		if($fieldcount >= 1) {
+   			$returnfields = 'return-fields='.$returnfieldstring;
+   		}
+
+   		return $returnfields;
    }
 
    /**
