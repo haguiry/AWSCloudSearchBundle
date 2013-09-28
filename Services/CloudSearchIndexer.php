@@ -39,8 +39,6 @@ class CloudSearchIndexer {
 	public function indexDocuments($documentsjson, $indexname, $action){
 		$documentobjs = json_decode($documentsjson);
 
-		$indexname = 'redeye_test';
-
 		//Get configuration for specified index.
 		if(isset($this->indexes[$indexname])){
 			$indexconfig = $this->indexes[$indexname];
@@ -84,7 +82,11 @@ error_log($result);
 		//Create Cloud Search Json Document
 		$document = new \StdClass;
 		$document->type = $action;
-		$document->id = $documentobj->id;
+		$id = $documentobj->id;
+		if(isset($indexconfig['id_prefix'])){
+			$id = $indexconfig['id_prefix'].$id;
+		}
+		$document->id = $id;
 
 		//Auto incerment version using unix timestamp.
 		$version = time();
