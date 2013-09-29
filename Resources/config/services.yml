@@ -6,7 +6,7 @@ services:
             class: RedEyeApps\AWSCloudSearchBundle\Services\CloudSearchIndexer
             arguments:
                 - "@service_container"
-    cloudsearcher:
-            class: RedEyeApps\AWSCloudSearchBundle\Services\CloudSearcher
+    cloudsearchclient:
+            class: RedEyeApps\AWSCloudSearchBundle\Services\CloudSearchClient
             arguments:
                 - "@service_container"
