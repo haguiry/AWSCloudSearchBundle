@@ -42,7 +42,6 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('id_prefix')
                                 ->isRequired(false)
                                 ->defaultValue('')
-                                ->cannotBeEmpty()
                             ->end()
                         ->end()
                     ->end()
