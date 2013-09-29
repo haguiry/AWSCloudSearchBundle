@@ -54,7 +54,7 @@ For full example subscriber see Resources/doc/ExampleIndexCommand.php
 There are a couple of approaches, one is to use this bundle:
 http://jmsyst.com/bundles/JMSSerializerBundle/master/installation
 
-This bundle is pretty complex to setup and adds a few extra depenacies. In our case we have just created a simple function on the entities we need to index called getSearchFields() which manually converts the entity to an object that that matches the fields configured for our indexes. This is just json encoded and passed to the indexer service.
+This bundle is pretty complex to setup and adds a few extra depenacies. In our case we have created a simple function on the entities we need to index called getSearchFields() which manually converts the entity to an object that that matches the fields configured for our indexes. This is then json encoded and passed to the indexer service.
 
 Example:
 
@@ -97,7 +97,7 @@ This matches an index with the fields:
 
 4) Search Usage
 --------------
-Searching using the CloudSearchClient services is pretty straight forward (the only required setting is setIndex):
+Searching using the CloudSearchClient service is pretty straight forward (the only required setting is setIndex):
 
         // Create search client
         $cloudsearcher = $this->get('cloudsearchclient');
