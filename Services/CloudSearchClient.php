@@ -159,7 +159,7 @@ class CloudSearchClient {
 			$searchurl .= "&size=".$this->limit;
 			$searchurl .= "&start=".$this->offset;
 			$searchurl .= $sortstr;
-error_log($searchurl);
+
 			//Do the search
 			$results = json_decode($this->get($searchurl));
 
