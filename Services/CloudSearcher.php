@@ -19,6 +19,14 @@ class CloudSearcher {
     protected $apiversion = "2011-02-01";
     protected $indexes;
 
+    private $indexname = '';
+    private $filters = array();
+    private $searchfields = array();
+    private $returnfields = array();
+    private $offset = 0;
+    private $limit = 25;
+    private $matchmode = 'normal';
+
     /**
     *	Constructor gets configured index settings for config.yml.
     */
@@ -26,41 +34,89 @@ class CloudSearcher {
 	{
 		$this->container = $container;
 		$this->indexes = $this->container->getParameter('aws_cloud_search.indexes');
+
+	}
+
+	/**
+	* Set index to be searched. Must match index name used in config.
+	* @param $indexname string - Name of index in config.
+	*/
+	public function setIndex($indexname) {
+		return $this->indexname = $indexname;
+	}
+
+	/**
+	* Add a field to boolean query to filter.
+	* @param $fieldname string - Name of field.
+	* @param $filter string - Type of filter as per AWS Cloud Search doco possible values: and, or
+	* @param $arrayvalues - Array of value to filter results with.
+	*/
+	public function addFilter($fieldname, $filtertype, $arrayvalues) {
+		$filter = new \StdClass;
+		$filter->name = $fieldname;
+		$filter->type = $filtertype;
+		$filter->values = $arrayvalues;
+		return $this->filters[] = $filter;
+	}
+
+	/**
+	* Add a field to search.
+	* @param $fieldname string - Name of field.
+	*/
+	public function addSearchField($fieldname) {
+		return $this->searchfields[] = $fieldname;
+	}
+
+	/**
+	* Add a field to list of fields to return.
+	* @param $fieldname string - Name of field.
+	*/
+	public function addReturnField($fieldname) {
+		return $this->returnfields[] = $fieldname;
+	}
+
+	/**
+	* Set search results offset
+	* @param $offset integer
+	*/
+	public function setOffset($offset) {
+		return $this->offset = $offset;
+	}
+
+	/**
+	* Set search results length
+	* @param $length integer
+	*/
+	public function setLimit($limit) {
+		return $this->limit = $limit;
+	}
+
+	/**
+	* Set search matchmode 
+	* @param $matchmode - Match mode, one of: normal, exact, startswith, endswith, any
+	*/
+	public function setMatchMode($matchmode) {
+		return $this->matchmode = $matchmode;
 	}
 
 	/**
 	* Index and Array of documents object. Objects must match AWS Cloud Search fields format and
 	* have unique integer property called id.
 	*
-	* @param indexname - string that matches configured index.
 	* @param searchterm - string search term to use.
-	* @param string - Match mode, one of: normal, exact, startswith, endswith, any
-	* @param integer - Number of results to return.
-	* @param integer - Results offset.
-	* @param array - Array of string field names to search with given search term.
-	* @param filterfields - Array of fields objects to filter search query by example:
-	*					  array( Object('fieldname' => 'groups', 'type' => 'and', 'values' => array(60, 1, 2, 3)))
-	* @param sortfields - Array of field objects to sort search results by in order of importance. Example:
-	*					  array(
-	*								Object('fieldname' => 'title', 'order' => 'DESC'), 
-	*								Object('fieldname' => 'author', 'order' => 'ASC')
-	*					  );
-	* @param array - Array of string field names to return on results, document id return by default.
 	*/
-	public function search($indexname, $searchterm = '', $matchmode = 'normal', $length = 25, $offset = 0, 
-						   $searchfields = array(), $filterfields = array(), $sortfields = array(),
-						   $returnfields = array()) {
+	public function search($searchterm = '') {
 
 		//Get configuration for specified index.
-		if(isset($this->indexes[$indexname])){
+		if(isset($this->indexes[$this->indexname])){
 
-			$indexconfig = $this->indexes[$indexname];
+			$indexconfig = $this->indexes[$this->indexname];
 
 			//Construct query string for fields to search with given term.
-			$searchfieldsstr = $this->searchFieldsQuery($searchfields, $searchterm, $matchmode);
+			$searchfieldsstr = $this->searchFieldsQuery($this->searchfields, $searchterm, $this->matchmode);
 
 			//Construct query string for filters.
-			$filtersstr = $this->filterFieldsQuery($filterfields);	
+			$filtersstr = $this->filterFieldsQuery($this->filters);	
 
 			//Construct sorting/ranking query string.
 			//$sortstr = $this->sortQuery($sortfields);	
@@ -79,19 +135,20 @@ class CloudSearcher {
 			} 
 
 			$searchurl = $indexconfig['search_endpoint']."/".$this->apiversion."/"."search?bq=".urlencode($searchstr);
-
+error_log(urlencode($searchstr));
 			//Set return fields
-			$returnfieldsstr = $this->returnFieldsQuery($returnfields);
+			$returnfieldsstr = $this->returnFieldsQuery($this->returnfields);
 			$searchurl .= "&".$returnfieldsstr;
 
 			//Set number results to return, and offset.
-			$searchurl .= "&size=".$length;
-			$searchurl .= "&start=".$offset;
+			$searchurl .= "&size=".$this->limit;
+			$searchurl .= "&start=".$this->offset;
 
 			//Do the search
-			$results = $this->get($searchurl);
+			$results = json_decode($this->get($searchurl));
 
-			return json_decode($results);
+			return $results;
+
 		} else {
 			return 'Specified index not configured.';
 		}
