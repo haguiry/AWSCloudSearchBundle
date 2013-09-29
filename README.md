@@ -1,5 +1,6 @@
 AWSCloudSearchBundle
 ====================
+Note: This bundle is in alpha development stage and is as such not for production environments. Our aim is to complete development and testing in the next two weeks. All contributions welcome.
 
 This bundle is designed to make it easier to integrate Amazon Cloud Search with Symfony2 projects to index entities regardless of database implementation.
 
