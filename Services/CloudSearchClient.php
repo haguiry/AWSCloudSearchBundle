@@ -23,6 +23,7 @@ class CloudSearchClient {
     private $filters = array();
     private $searchfields = array();
     private $returnfields = array();
+    private $sorts = array();
     private $offset = 0;
     private $limit = 25;
     private $matchmode = 'normal';
@@ -76,6 +77,19 @@ class CloudSearchClient {
 	}
 
 	/**
+	* Add a field to sort order of results.
+	* @param $name string - Name of sort field or expression predefined in AWS console.
+	* @param $order string - Order to sort this field etiher ASC or DESC
+	* Note: If using field to sort it must be enabled as a result field in AWS console.
+	*/
+	public function addSort($name, $order = 'ASC') {
+		$sort = new \StdClass;
+		$sort->name = $name;
+		$sort->order = $order;
+		return $this->sorts[] = $sort;
+	}
+
+	/**
 	* Set search results offset
 	* @param $offset integer
 	*/
@@ -119,7 +133,7 @@ class CloudSearchClient {
 			$filtersstr = $this->filterFieldsQuery($this->filters);	
 
 			//Construct sorting/ranking query string.
-			//$sortstr = $this->sortQuery($sortfields);	
+			$sortstr = $this->sortQuery($this->sorts);	
 
 			//Construct overall query string.
 			$searchstr = '';
@@ -135,15 +149,17 @@ class CloudSearchClient {
 			} 
 
 			$searchurl = $indexconfig['search_endpoint']."/".$this->apiversion."/"."search?bq=".urlencode($searchstr);
-error_log(urlencode($searchstr));
+
 			//Set return fields
 			$returnfieldsstr = $this->returnFieldsQuery($this->returnfields);
-			$searchurl .= "&".$returnfieldsstr;
+			$searchurl .= $returnfieldsstr;
 
 			//Set number results to return, and offset.
+	
 			$searchurl .= "&size=".$this->limit;
 			$searchurl .= "&start=".$this->offset;
-
+			$searchurl .= $sortstr;
+error_log($searchurl);
 			//Do the search
 			$results = json_decode($this->get($searchurl));
 
@@ -198,10 +214,7 @@ error_log(urlencode($searchstr));
 
 	/**
 	* Creates boolean query to filter results with.
-	* @param filterfields - Array of fields objects to filter search query by example:
-	*					    array( Object('fieldname' => 'groups', 'type' => 'and', 'values' => array(60, 1, 2, 3))
-	* NOTE: Order matters for example if filtering by two fields, one as and, and the other as or query result
-	* will be different based on order in array. 
+	* @param filterfields - Array of fields defined using addFilter
 	*/
 	private function filterFieldsQuery($filterfields) {
 		
@@ -234,34 +247,35 @@ error_log(urlencode($searchstr));
 
    /**
    * Generates query string to match Cloud Search API for sorting.
-   * @param sortfields - Array of field objects with fieldname and order (ASC or DESC).
+   * @param sortfields - Array of sort fields/expressions specified with addSortField.
    * NOTE: Multiple sorts are applied in sortfields array order. 
    */
-   private function sortQuery($sortfields) {
+   private function sortQuery($sorts) {
    		$sortstring = '';
-   		$sortfieldcount = 0;
+   		$sortcount = 0;
 
-   		foreach($sortfields as $sortfieldobj) {
-   			$sortfield = '';
+   		foreach($sorts as $sort) {
+   			$sortstr = '';
 
-   			if(isset($sortfieldobj->name)){
-   				$sortfield = $sortfieldobj->name;
+   			if(isset($sort->name)){
+   				$sortstr .= $sort->name;
 
-   				//Set Order
-   				if(isset($sortfieldobj->order) && $sortfieldobj->order == 'ASC') {
-   					$sortfield = '-'.$sortfield;
+   				//Set Order (default is ASC)
+   				if(isset($sort->order) && $sort->order == 'DESC') {
+   					$sortstr = '-'.$sortstr;
    				}
-   			
-   				if($sortfieldcount >= 1) {
+
+   				//Comma seperate		
+   				if($sortcount >= 1) {
    					$sortstring .= ',';
    				}
 
-   				$sortstring .= $sortfield;
-   				$sortfieldcount++;
+   				$sortstring .= $sortstr;
+   				$sortcount++;
    			}
    		}
 
-   		if($sortfieldcount > 0) {
+   		if($sortcount > 0) {
    			$sortstring = '&rank='.$sortstring;
    		}
 
@@ -285,7 +299,7 @@ error_log(urlencode($searchstr));
    		}
 
    		if($fieldcount >= 1) {
-   			$returnfields = 'return-fields='.$returnfieldstring;
+   			$returnfields = '&return-fields='.$returnfieldstring;
    		}
 
    		return $returnfields;
