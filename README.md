@@ -97,6 +97,40 @@ This matches an index with the fields:
 
 4) Search Usage
 --------------
+Searching using the CloudSearchClient services is pretty straight forward (the only required setting is setIndex):
+
+        // Create search client
+        $cloudsearcher = $this->get('cloudsearchclient');
+
+        //Specify index to search. Must match indexname in config.yml
+        $cloudsearcher->setIndex('redeyevms');
+
+        //Set text fields to search with search term
+        $cloudsearcher->addSearchField('title');
+        $cloudsearcher->addSearchField('desc');
+
+        //Set fields to recieve in results
+        $cloudsearcher->addReturnField('title');
+
+        //Set a sort field
+        $cloudsearcher->addSort('title', 'ASC');
+
+        //Set offsets and result limit, useful for paging.
+        $cloudsearcher->setOffset($offset);
+        $cloudsearcher->setLimit($resultlength);
+
+        // Match mode, one of: normal, exact, startswith, endswith, any. Defaults to normal.
+        $cloudsearcher->setMatchMode('startswith');
+
+        //Add a filter to search
+        $cloudsearcher->addFilter('genre', 'or', array('horror', 'sci-fi')); //Genre can be either horror or sci-fi.
+
+        //Do search with string as search term
+        $results = $cloudsearcher->search('star wars');      
+
+
+Format of results is documented here:
+http://docs.aws.amazon.com/cloudsearch/latest/developerguide/Search.Response.html
 
 
 
