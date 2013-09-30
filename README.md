@@ -39,17 +39,17 @@ Also remember to setup your AWS Cloud Search access rules to allow indexing and 
 
 3) Indexer Usage
 --------------
-To index documents you need to create a JSON array of documents that match the AWC Cloud Search fields format you configured in the AWS console and post it to Cloud Search.
+To index documents you need to create a JSON array of documents that match the AWS Cloud Search fields format you configured in the AWS console and post it to Cloud Search.
 
-To index changes to entities (adds/updates/removes) it is recommended you us an event subscriber to doctrine persist events and index changes to entities on the fly.
+To index changes to entities (adds/updates/removes) it is recommended you us an event subscriber to doctrine persist events to index entity changes on the fly.
 
 To create a subscriber see:
 http://symfony.com/doc/current/cookbook/doctrine/event_listeners_subscribers.html
 
 For full example subscriber see Resources/doc/ExampleSubscriber.php
         
-To do initial indexing of entities it is recommend you use a Symfony2 command.
-For full example subscriber see Resources/doc/ExampleIndexCommand.php
+To do initial indexing of entities it is recommended you use a Symfony2 command.
+For full example indexing command see Resources/doc/ExampleIndexCommand.php
 
 ## Notes on Converting Entity to Json
 There are a couple of approaches, one is to use this bundle:
@@ -59,6 +59,7 @@ This bundle is pretty complex to setup and adds a few extra depenacies. In our c
 
 Example:
 
+        //src/MyOrg/MyBundle/Entity/MyEntity.php
         public function getSearchFields() {
             $obj = new \StdClass;
             $obj->id = $this->getId();
