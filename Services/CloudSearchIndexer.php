@@ -56,14 +56,19 @@ class CloudSearchIndexer {
 
 			//Post batch to Cloud Search	
 			$result = $this->post($indexconfig['doc_endpoint'].'/'.$this->apiversion.'/documents/batch', $documents);
+			
+			if(is_object($result)){
+				$result = json_decode($result);
+		
+				if($result->status == 'success') {
+					return 'Success, total adds: '. $result->adds. ' & total deletes: ' . $result->deletes;
 
-			$result = json_decode($result);
-	
-			if($result->status == 'success') {
-				return 'Success, total adds: '. $result->adds. ' & total deletes: ' . $result->deletes;
-
+				} else {
+					return $result->status;
+				}
 			} else {
-				return $result->status;
+				//HTTP type error such as 404, 503
+				return $result;	
 			}
 
 		} else {
