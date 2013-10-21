@@ -155,15 +155,14 @@ class CloudSearchClient {
 			$searchurl .= $returnfieldsstr;
 
 			//Set number results to return, and offset.
-	
 			$searchurl .= "&size=".$this->limit;
 			$searchurl .= "&start=".$this->offset;
 			$searchurl .= $sortstr;
 
 			//Do the search
-			$results = json_decode($this->get($searchurl));
+			$results = $this->get($searchurl);
 
-			return $results;
+			return json_decode($results);
 
 		} else {
 			return 'Specified index not configured.';
@@ -193,9 +192,6 @@ class CloudSearchClient {
 		    case 'startswith':
 		        $startswith = '*';
 		        break;
-		    case 'endswith':
-		        $endswith = '*';
-		        break;
 		    case 'any':
 		        $endswith = '*';
 		       	$startswith = '*';
@@ -205,7 +201,7 @@ class CloudSearchClient {
 
 		//Create search query for each field specified.
 		foreach ($searchfields as $searchfield) {
-				$searchfieldsstr .= $searchfield . ':' . $quote . $endswith . $searchterm . $startswith .$quote . " ";
+				$searchfieldsstr .= $searchfield . ':' . $quote . $endswith . $searchterm . $startswith .$quote . ' ';
 				$searchfieldcount++;
 		}
 

@@ -56,7 +56,7 @@ class CloudSearchIndexer {
 
 			//Post batch to Cloud Search	
 			$result = $this->post($indexconfig['doc_endpoint'].'/'.$this->apiversion.'/documents/batch', $documents);
-			
+
 			if(is_object($result)){
 				$result = json_decode($result);
 		
