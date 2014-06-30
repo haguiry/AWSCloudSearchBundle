@@ -1,5 +1,6 @@
-{
-  "name": "redeyeapps/awscloudsearchbundle",
+"repositories": [
+  {
+  "name": "haguiry/awscloudsearchbundle",
   "type": "symfony-bundle",
   "description": "AWS Cloud Search bundle for Symfony 2",
   "keywords": ["aws", "cloudsearch", "symfony2"],
@@ -21,3 +22,4 @@
   },
   "target-dir": "RedEyeApps/AWSCloudSearchBundle"
 }
+],
