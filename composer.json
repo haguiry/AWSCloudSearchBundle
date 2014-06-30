@@ -1,10 +1,9 @@
-"repositories": [
-  {
+{
   "name": "haguiry/awscloudsearchbundle",
   "type": "symfony-bundle",
   "description": "AWS Cloud Search bundle for Symfony 2",
   "keywords": ["aws", "cloudsearch", "symfony2"],
-  "homepage": "https://github.com/RedEyeDrafting/AWSCloudSearchBundle",
+  "homepage": "https://github.com/haguiry/AWSCloudSearchBundle",
   "license": "BSD-2-Clause",
   "authors": [
     {
@@ -22,4 +21,3 @@
   },
   "target-dir": "RedEyeApps/AWSCloudSearchBundle"
 }
-],
